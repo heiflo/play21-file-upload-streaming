@@ -1,4 +1,4 @@
-A simple Play 2.1 application demonstrating how to stream a HTTP file upload
+A simple Play 2.1 application demonstrating how to stream an HTTP file upload
 ============================================================================
 
 Just clone the repo

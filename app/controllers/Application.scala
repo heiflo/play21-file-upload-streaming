@@ -76,7 +76,7 @@ object Application extends Controller {
             case Input.El(e) => {
               val s1 = f(s, e)
               result match {
-                // if there occurred during output stream initialisation, set Iteratee to Done
+                // if an error occurred during output stream initialisation, set Iteratee to Done
                 case Some(result) => Done(s, Input.EOF)
                 case None => Cont[E, A](i => step(s1)(i))
               }

@@ -12,7 +12,7 @@ case class StreamingError(errorMessage: String)
 
 object StreamingBodyParser {
 
-  val streamingBodyParser = BodyParser { request =>
+  def streamingBodyParser = BodyParser { request =>
     // Use Play's existing multipart parser from play.api.mvc.BodyParsers.
     // The RequestHeader object is wrapped here so it can be accessed in streamingFilePartHandler method
     parse.multipartFormData(StreamingBodyParser.streamingFilePartHandler(request)).apply(request)

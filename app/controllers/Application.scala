@@ -60,7 +60,9 @@ object Application extends Controller {
         var outputStream: Option[OutputStream] = None
         // For example, you want to stream to a file
         try {
-          outputStream = Option(new FileOutputStream(new File("/thePathToAFile")))
+          val dir = new File(sys.env("HOME"), "/uploadedFiles")
+          dir.mkdirs()
+          outputStream = Option(new FileOutputStream(new File(dir, filename)))
         } catch {
           case e: Exception => {
             Logger.error(e.getMessage)

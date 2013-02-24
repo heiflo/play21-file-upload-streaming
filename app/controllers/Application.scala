@@ -10,9 +10,10 @@ import scala.Some
 import play.api.Logger
 
 object Application extends Controller {
+  val welcomeMsg = "Play Scala File Upload"
 
   def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+    Ok(views.html.index(welcomeMsg))
   }
 
   def upload = Action(streamingBodyParser) { request =>

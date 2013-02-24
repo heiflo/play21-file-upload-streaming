@@ -37,7 +37,7 @@ object Application extends Controller {
     parse.multipartFormData(streamingFilePartHandler(request)).apply(request)
   }
 
-  // custom implemenation of a PartHandler, inspired by these Play mailing list threads:
+  // custom implementation of a PartHandler, inspired by these Play mailing list threads:
   // https://groups.google.com/forum/#!searchin/play-framework/PartHandler/play-framework/WY548Je8VB0/dJkj3arlBigJ
   // https://groups.google.com/forum/#!searchin/play-framework/PartHandler/play-framework/n7yF6wNBL_s/wBPFHBBiKUwJ
   def streamingFilePartHandler(request: RequestHeader): BodyParsers.parse.Multipart.PartHandler[FilePart[Either[StreamingError, StreamingSuccess]]] = {

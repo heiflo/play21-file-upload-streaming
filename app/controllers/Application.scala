@@ -45,9 +45,10 @@ object Application extends Controller {
   // https://groups.google.com/forum/#!searchin/play-framework/PartHandler/play-framework/WY548Je8VB0/dJkj3arlBigJ
   // https://groups.google.com/forum/#!searchin/play-framework/PartHandler/play-framework/n7yF6wNBL_s/wBPFHBBiKUwJ
   def streamingFilePartHandler(request: RequestHeader) : BodyParsers.parse.Multipart.PartHandler[FilePart[Either[StreamingError, StreamingSuccess]]] = {
-    var result: Option[StreamingError] = None
     parse.Multipart.handleFilePart {
       case parse.Multipart.FileInfo(partName, filename, contentType) =>
+        // Reference to hold the error message
+        var result: Option[StreamingError] = None
         // Following the output stream you'll write to. In case something goes wrong while trying to instantiate
         // the output stream, assign the error message to the result reference, e.g.
         // result = Some(StreamingError("network error"))
@@ -59,7 +60,7 @@ object Application extends Controller {
         var outputStream: Option[OutputStream] = None
         // For example, you want to stream to a file
         try {
-          outputStream = Option(new FileOutputStream(new File("/anyDirectory/thePathToAFile")))
+          outputStream = Option(new FileOutputStream(new File("/thePathToAFile")))
         } catch {
           case e: Exception => {
             Logger.error(e.getMessage)

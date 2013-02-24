@@ -2,8 +2,7 @@ package controllers
 
 import play.api._
 import mvc._
-import services.{StreamingSuccess, StreamingError, StreamingBodyParser}
-import StreamingBodyParser.streamingBodyParser
+import services.StreamingBodyParser.streamingBodyParser
 
 object Application extends Controller {
   val welcomeMsg = "Play Scala File Upload"
@@ -13,7 +12,7 @@ object Application extends Controller {
   }
 
   def upload = Action(streamingBodyParser) { request =>
-    val params = request.body.asFormUrlEncoded // you can use request parameters if you want
+    val params = request.body.asFormUrlEncoded // you can extract request parameters for whatever your app needs
     val result = request.body.files(0).ref
     if (result.isRight) { // streaming succeeded
       val filename = result.right.get.filename

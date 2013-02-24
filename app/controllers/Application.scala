@@ -48,7 +48,7 @@ object Application extends Controller {
     parse.Multipart.handleFilePart {
       case parse.Multipart.FileInfo(partName, filename, contentType) =>
         // Reference to hold the error message
-        var result: Option[StreamingError] = None
+        var errorMsg: Option[StreamingError] = None
         // Following the output stream you'll write to. In case something goes wrong while trying to instantiate
         // the output stream, assign the error message to the result reference, e.g.
         // result = Some(StreamingError("network error"))
@@ -57,18 +57,19 @@ object Application extends Controller {
         // Please bear in mind that even if the Iteratee does nothing when the outputStream = None
         // the whole HTTP request will still be processed (there is no way to cancel an HTTP request
         // from the server side).
-        var outputStream: Option[OutputStream] = None
-        // For example, you want to stream to a file
-        try {
-          val dir = new File(sys.env("HOME"), "/uploadedFiles")
-          dir.mkdirs()
-          outputStream = Option(new FileOutputStream(new File(dir, filename)))
-        } catch {
-          case e: Exception => {
-            Logger.error(e.getMessage)
-            result = Some(StreamingError(e.getMessage))
+        val outputStream: Option[OutputStream] =
+          try {
+            // For example, you want to stream to a file
+            val dir = new File(sys.env("HOME"), "/uploadedFiles")
+            dir.mkdirs()
+            Option(new FileOutputStream(new File(dir, filename)))
+          } catch {
+            case e: Exception => {
+              Logger.error(e.getMessage)
+              errorMsg = Some(StreamingError(e.getMessage))
+              None
+            }
           }
-        }
 
         // The fold method that actually does the parsing of the multipart file part.
         // Type A is expected to be Option[OutputStream]
@@ -78,7 +79,7 @@ object Application extends Controller {
             case Input.Empty => Cont[E, A](i => step(s)(i))
             case Input.El(e) => {
               val s1 = f(s, e)
-              result match {
+              errorMsg match {
                 // if an error occurred during output stream initialisation, set Iteratee to Done
                 case Some(result) => Done(s, Input.EOF)
                 case None => Cont[E, A](i => step(s1)(i))
@@ -99,7 +100,7 @@ object Application extends Controller {
             case Some(outputStream) => outputStream.close
             case None => Logger.debug("no output stream to close")
           }
-          result match {
+          errorMsg match {
             // streaming failed - Left is returned
             case Some(result) => {
               Logger.error("Streaming the file " + filename + " failed: " + result.errorMessage)

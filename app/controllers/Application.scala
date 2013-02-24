@@ -17,16 +17,16 @@ object Application extends Controller {
   }
 
   def upload = Action(streamingBodyParser) { request =>
-      // get request parameters
-      val params = request.body.asFormUrlEncoded
-      if (request.body.files(0).ref.isRight) { // streaming succeeded
-        val success: StreamingSuccess = request.body.files(0).ref.right.get
-        val filename = success.filename
-        Ok(s"File $filename successfully streamed.")
-      } else { // file streaming failed
-        val error: StreamingError = request.body.files(0).ref.left.get
-        Ok(s"Streaming error occurred: ${error.errorMessage}")
-      }
+    // get request parameters
+    val params = request.body.asFormUrlEncoded
+    if (request.body.files(0).ref.isRight) { // streaming succeeded
+      val success: StreamingSuccess = request.body.files(0).ref.right.get
+      val filename = success.filename
+      Ok(s"File $filename successfully streamed.")
+    } else { // file streaming failed
+      val error: StreamingError = request.body.files(0).ref.left.get
+      Ok(s"Streaming error occurred: ${error.errorMessage}")
+    }
   }
 
   case class StreamingSuccess(filename: String)

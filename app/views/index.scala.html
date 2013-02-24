@@ -1,7 +1,7 @@
 @(message: String)
 @main(message) {
-    @helper.form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
-        <input type="file" name="file">
-        <p><input type="submit"></p>
-    }
+  @helper.form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
+    <input type="file" name="file">
+    <p><input type="submit"></p>
+  }
 }

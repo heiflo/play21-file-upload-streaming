@@ -1,9 +1,9 @@
 package services
 
-import play.api.mvc.{Result, BodyParser, BodyParsers, RequestHeader}
+import play.api.mvc.{BodyParser, BodyParsers, RequestHeader}
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.MultipartFormData.FilePart
-import java.io.{FileOutputStream, File, OutputStream}
+import java.io.OutputStream
 import play.api.Logger
 import play.api.libs.iteratee.{Cont, Done, Input, Iteratee}
 
@@ -12,12 +12,14 @@ case class StreamingError(errorMessage: String)
 
 object StreamingBodyParser {
 
-  def streamingBodyParser = BodyParser { request =>
+  def streamingBodyParser(streamConstructor: String => Option[OutputStream]) = BodyParser { request =>
     // Use Play's existing multipart parser from play.api.mvc.BodyParsers.
     // The RequestHeader object is wrapped here so it can be accessed in streamingFilePartHandler method
-    parse.multipartFormData(StreamingBodyParser.streamingFilePartHandler(request)).apply(request)
+    parse.multipartFormData(new StreamingBodyParser(streamConstructor).streamingFilePartHandler(request)).apply(request)
   }
+}
 
+class StreamingBodyParser(streamConstructor: String => Option[OutputStream]) {
   // Custom implementation of a PartHandler, inspired by these Play mailing list threads:
   // https://groups.google.com/forum/#!searchin/play-framework/PartHandler/play-framework/WY548Je8VB0/dJkj3arlBigJ
   // https://groups.google.com/forum/#!searchin/play-framework/PartHandler/play-framework/n7yF6wNBL_s/wBPFHBBiKUwJ
@@ -26,19 +28,17 @@ object StreamingBodyParser {
       case parse.Multipart.FileInfo(partName, filename, contentType) =>
         // Reference to hold the error message
         var errorMsg: Option[StreamingError] = None
-        // Following the output stream you'll write to. In case something goes wrong while trying to instantiate
-        // the output stream, assign the error message to the result reference, e.g.
-        // result = Some(StreamingError("network error"))
-        // and set the outputStream reference to None -> the Iteratee will then do nothing
-        // and the error message will be passed to the Action.
-        // Please bear in mind that even if the Iteratee does nothing when the outputStream = None
-        // the whole HTTP request will still be processed (there is no way to cancel an HTTP request
-        // from the server side).
-        val outputStream: Option[OutputStream] =
-          try { // This example streams to a file
-            val dir = new File(sys.env("HOME"), "uploadedFiles")
-            dir.mkdirs()
-            Option(new FileOutputStream(new File(dir, filename)))
+
+          // Following the output stream you'll write to. In case something goes wrong while trying to instantiate
+          // the output stream, assign the error message to the result reference, e.g.
+          // result = Some(StreamingError("network error"))
+          // and set the outputStream reference to None -> the Iteratee will then do nothing
+          // and the error message will be passed to the Action.
+          // Please bear in mind that even if the Iteratee does nothing when the outputStream = None
+          // the whole HTTP request will still be processed (there is no way to cancel an HTTP request
+          // from the server side).
+         val outputStream: Option[OutputStream] = try {
+            streamConstructor(filename)
           } catch {
             case e: Exception => {
               Logger.error(e.getMessage)

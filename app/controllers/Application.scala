@@ -15,20 +15,16 @@ object Application extends Controller {
     Ok(views.html.index("Your new application is ready."))
   }
 
-  def upload = Action(streamingBodyParser) {
-    request =>
+  def upload = Action(streamingBodyParser) { request =>
       // get request parameters
       val params = request.body.asFormUrlEncoded
-      // streaming succeeded
-      if (request.body.files(0).ref.isRight) {
+      if (request.body.files(0).ref.isRight) { // streaming succeeded
         val success: StreamingSuccess = request.body.files(0).ref.right.get
         val filename = success.filename
         Ok("File " + filename + " successfully streamed")
-      }
-      // file streaming failed
-      else {
+      } else { // file streaming failed
         val error: StreamingError = request.body.files(0).ref.left.get
-        Ok("Streaming error occured: " + error.errorMessage)
+        Ok("Streaming error occurred: " + error.errorMessage)
       }
   }
 
@@ -44,7 +40,7 @@ object Application extends Controller {
   // custom implemenation of a PartHandler, inspired by these Play mailing list threads:
   // https://groups.google.com/forum/#!searchin/play-framework/PartHandler/play-framework/WY548Je8VB0/dJkj3arlBigJ
   // https://groups.google.com/forum/#!searchin/play-framework/PartHandler/play-framework/n7yF6wNBL_s/wBPFHBBiKUwJ
-  def streamingFilePartHandler(request: RequestHeader) : BodyParsers.parse.Multipart.PartHandler[FilePart[Either[StreamingError, StreamingSuccess]]] = {
+  def streamingFilePartHandler(request: RequestHeader): BodyParsers.parse.Multipart.PartHandler[FilePart[Either[StreamingError, StreamingSuccess]]] = {
     parse.Multipart.handleFilePart {
       case parse.Multipart.FileInfo(partName, filename, contentType) =>
         // Reference to hold the error message
@@ -58,8 +54,7 @@ object Application extends Controller {
         // the whole HTTP request will still be processed (there is no way to cancel an HTTP request
         // from the server side).
         val outputStream: Option[OutputStream] =
-          try {
-            // For example, you want to stream to a file
+          try { // This example streams to a file
             val dir = new File(sys.env("HOME"), "/uploadedFiles")
             dir.mkdirs()
             Option(new FileOutputStream(new File(dir, filename)))
@@ -79,8 +74,7 @@ object Application extends Controller {
             case Input.Empty => Cont[E, A](i => step(s)(i))
             case Input.El(e) => {
               val s1 = f(s, e)
-              errorMsg match {
-                // if an error occurred during output stream initialisation, set Iteratee to Done
+              errorMsg match { // if an error occurred during output stream initialisation, set Iteratee to Done
                 case Some(result) => Done(s, Input.EOF)
                 case None => Cont[E, A](i => step(s1)(i))
               }
@@ -90,16 +84,10 @@ object Application extends Controller {
         }
 
         fold[Array[Byte], Option[OutputStream]](outputStream) { (os, data) =>
-          os match {
-            case Some(outputStream) => outputStream.write(data)
-            case None => // do nothing
-          }
+          os foreach { _.write(data) }
           os
         }.mapDone { os =>
-          os match {
-            case Some(outputStream) => outputStream.close
-            case None => Logger.debug("no output stream to close")
-          }
+          os foreach { _.close }
           errorMsg match {
             // streaming failed - Left is returned
             case Some(result) => {
@@ -115,5 +103,4 @@ object Application extends Controller {
         }
     }
   }
-
 }

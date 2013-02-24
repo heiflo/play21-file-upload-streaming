@@ -21,10 +21,10 @@ object Application extends Controller {
       if (request.body.files(0).ref.isRight) { // streaming succeeded
         val success: StreamingSuccess = request.body.files(0).ref.right.get
         val filename = success.filename
-        Ok("File " + filename + " successfully streamed")
+        Ok(s"File $filename successfully streamed.")
       } else { // file streaming failed
         val error: StreamingError = request.body.files(0).ref.left.get
-        Ok("Streaming error occurred: " + error.errorMessage)
+        Ok(s"Streaming error occurred: ${error.errorMessage}")
       }
   }
 
@@ -55,7 +55,7 @@ object Application extends Controller {
         // from the server side).
         val outputStream: Option[OutputStream] =
           try { // This example streams to a file
-            val dir = new File(sys.env("HOME"), "/uploadedFiles")
+            val dir = new File(sys.env("HOME"), "uploadedFiles")
             dir.mkdirs()
             Option(new FileOutputStream(new File(dir, filename)))
           } catch {
@@ -91,12 +91,12 @@ object Application extends Controller {
           errorMsg match {
             // streaming failed - Left is returned
             case Some(result) => {
-              Logger.error("Streaming the file " + filename + " failed: " + result.errorMessage)
+              Logger.error(s"Streaming the file $filename failed: ${result.errorMessage}")
               Left(result)
             }
             // streaming succeeded - Right is returned
             case None => {
-              Logger.info("Streaming the file " + filename + " finished.")
+              Logger.info(s"$filename finished streaming.")
               Right(StreamingSuccess(filename))
             }
           }

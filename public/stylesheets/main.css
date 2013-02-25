@@ -1,0 +1,18 @@
+body, h1, h2, h3, h4, li, p, .copyright, .normal, .blue, .bold, .smaller, .title, .head1, .head2, .head3 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+h1, h2, h3, h4, .head1, .head2, .head3 {
+   text-align: left;
+   font-style: normal;
+   font-weight: 500;
+   padding-bottom: 0;
+   margin-left: 0.3em;
+}
+h1, .head1 { font-size: 18pt; font-weight: bold; }
+h2, .head2 { font-size: 14pt; font-weight: bold; padding-top: 8pt; }
+h3, .head3, .title { font-size: 12pt; font-weight: bold; }
+h4, .head3, .title { font-size: 11pt; font-weight: bold; }
+h1 { margin-top: 17pt; margin-bottom: 0; }
+h2 { margin-top: 7pt; margin-bottom: 0; }
+h3 { margin-top: 6pt; margin-bottom: 0; }
+h4 { margin-top: 12pt; margin-bottom: 0; }

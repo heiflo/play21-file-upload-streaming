@@ -1,7 +1,0 @@
-#!/bin/bash
- 
-export awsAccessKey="AKIAJUARYL73S3RL2JOQ"
-export awsSecretKey="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"
-export awsBucketName="mslinnTest"
-$PLAY21_HOME/play debug run
-

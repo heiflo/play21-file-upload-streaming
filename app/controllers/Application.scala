@@ -6,7 +6,7 @@ import services.StreamingBodyParser.streamingBodyParser
 import java.io.{FileOutputStream, File}
 
 object Application extends Controller {
-  val welcomeMsg = "Demonstrations of Streaming File Uploads for Play 2.1"
+  val welcomeMsg = "Demonstration of Streaming File Upload for Play 2.1"
 
   def index = Action {
     Ok(views.html.index(welcomeMsg))

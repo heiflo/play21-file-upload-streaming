@@ -6,10 +6,4 @@
     <input type="file" name="file">
     <p><input type="submit"></p>
   }
-
-  <h2>Upload to AWS S3</h2>
-  @helper.form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
-    <input type="file" name="file">
-    <p><input type="submit"></p>
-  }
 }

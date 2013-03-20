@@ -20,7 +20,8 @@ object Application extends Controller {
       // get request parameters
       val params = request.body.asFormUrlEncoded
       // streaming succeeded
-      if (request.body.files(0).ref.isRight) {
+      request.body.files.foreach(entry => Logger.info(entry.toString))
+      if (request.body.files.length > 0 && request.body.files(0).ref.isRight) {
         val success: StreamingSuccess = request.body.files(0).ref.right.get
         val filename = success.filename
         Ok("File " + filename + " successfully streamed")
@@ -58,9 +59,9 @@ object Application extends Controller {
         // the whole HTTP request will still be processed (there is no way to cancel an HTTP request
         // from the server side).
         var outputStream: Option[OutputStream] = None
-        // For example, you want to stream to a file
+        // For example, you want to stream to a file. I provided a FileOutputStream to provide a working example
         try {
-          outputStream = Option(new FileOutputStream(new File("/thePathToAFile")))
+          outputStream = Option(new FileOutputStream(new File(System.getProperty("java.io.tmpdir") + File.separator + filename)))
         } catch {
           case e: Exception => {
             Logger.error(e.getMessage)

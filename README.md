@@ -15,4 +15,9 @@ AWS S3 using the [AWS Java SDK](http://aws.amazon.com/documentation/sdkforjava/)
 Just clone the repo and run it with Play on your local machine:
 <pre>play debug run</pre>
 
+You can upload using curl instead of the web browser. Thanks to Andrew Gaydenko for the incantation:
+<pre>curl -i --no-keepalive -F name=myFile.mp4 -F filedata=@myFile.mp4 http://localhost:9000/upload</pre>
+
+Files are uploaded to ~/uploadedFiles.
+
 You'll find inline comments in the code.
